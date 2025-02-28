@@ -1,0 +1,233 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "001eb41e-4132-41ae-b58f-13ea7630125a",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "4\n"
+     ]
+    }
+   ],
+   "source": [
+    "from collections import deque\n",
+    "\n",
+    "class Solution:\n",
+    "    def solve(self, board):\n",
+    "        start = tuple(sum(board, []))  # Flatten the board into a tuple\n",
+    "        target = (0, 1, 2, 3, 4, 5, 6, 7, 8)\n",
+    "        \n",
+    "        if start == target:\n",
+    "            return 0\n",
+    "        \n",
+    "        queue = deque([(start, 0)])  # (current state, depth)\n",
+    "        visited = {start}\n",
+    "        \n",
+    "        while queue:\n",
+    "            node, depth = queue.popleft()\n",
+    "            for next_state in self.find_next(node):\n",
+    "                if next_state not in visited:\n",
+    "                    if next_state == target:\n",
+    "                        return depth + 1\n",
+    "                    queue.append((next_state, depth + 1))\n",
+    "                    visited.add(next_state)\n",
+    "        \n",
+    "        return -1  # No solution found\n",
+    "    \n",
+    "    def find_next(self, node):\n",
+    "        moves = {\n",
+    "            0: [1, 3], 1: [0, 2, 4], 2: [1, 5],\n",
+    "            3: [0, 4, 6], 4: [1, 3, 5, 7], 5: [2, 4, 8],\n",
+    "            6: [3, 7], 7: [4, 6, 8], 8: [5, 7]\n",
+    "        }\n",
+    "        \n",
+    "        results = []\n",
+    "        pos_0 = node.index(0)\n",
+    "        for move in moves[pos_0]:\n",
+    "            new_node = list(node)\n",
+    "            new_node[move], new_node[pos_0] = new_node[pos_0], new_node[move]\n",
+    "            results.append(tuple(new_node))\n",
+    "        \n",
+    "        return results\n",
+    "\n",
+    "# Example usage\n",
+    "ob = Solution()\n",
+    "matrix = [\n",
+    "    [3, 1, 2],\n",
+    "    [4, 7, 5],\n",
+    "    [6, 8, 0]\n",
+    "]\n",
+    "print(ob.solve(matrix))\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "fd483041-bec8-4a77-9b63-ae8be5bee06e",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Enter the number of queens\n"
+     ]
+    },
+    {
+     "name": "stdin",
+     "output_type": "stream",
+     "text": [
+      " 8\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Solution exists. Placements of queens:\n",
+      "[1, 0, 0, 0, 0, 0, 0, 0]\n",
+      "[0, 0, 0, 0, 1, 0, 0, 0]\n",
+      "[0, 0, 0, 0, 0, 0, 0, 1]\n",
+      "[0, 0, 0, 0, 0, 1, 0, 0]\n",
+      "[0, 0, 1, 0, 0, 0, 0, 0]\n",
+      "[0, 0, 0, 0, 0, 0, 1, 0]\n",
+      "[0, 1, 0, 0, 0, 0, 0, 0]\n",
+      "[0, 0, 0, 1, 0, 0, 0, 0]\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(\"Enter the number of queens\")\n",
+    "N = int(input())\n",
+    "\n",
+    "# Create a chessboard NxN matrix with all elements set to 0\n",
+    "board = [[0] * N for _ in range(N)]\n",
+    "\n",
+    "def is_safe(row, col):\n",
+    "    # Checking vertically\n",
+    "    for i in range(row):\n",
+    "        if board[i][col] == 1:\n",
+    "            return False\n",
+    "\n",
+    "    # Checking upper-left diagonal\n",
+    "    for i, j in zip(range(row, -1, -1), range(col, -1, -1)):\n",
+    "        if board[i][j] == 1:\n",
+    "            return False\n",
+    "\n",
+    "    # Checking upper-right diagonal\n",
+    "    for i, j in zip(range(row, -1, -1), range(col, N)):\n",
+    "        if board[i][j] == 1:\n",
+    "            return False\n",
+    "    \n",
+    "    return True\n",
+    "\n",
+    "def solve_n_queens(row):\n",
+    "    if row >= N:\n",
+    "        return True\n",
+    "\n",
+    "    for col in range(N):\n",
+    "        if is_safe(row, col):\n",
+    "            board[row][col] = 1\n",
+    "            if solve_n_queens(row + 1):\n",
+    "                return True\n",
+    "            board[row][col] = 0\n",
+    "    \n",
+    "    return False\n",
+    "\n",
+    "# Check if a solution exists\n",
+    "if solve_n_queens(0):\n",
+    "    print(\"Solution exists. Placements of queens:\")\n",
+    "    for row in board:\n",
+    "        print(row)\n",
+    "else:\n",
+    "    print(\"No solution exists.\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "0032bdeb-f104-4f87-95a4-d485ad9d53ac",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Following is Breadth First Traversal (starting from vertex 2)\n",
+      "2 0 3 1 "
+     ]
+    }
+   ],
+   "source": [
+    "from collections import defaultdict\n",
+    "\n",
+    "class Graph:\n",
+    "    def __init__(self):\n",
+    "        self.graph = defaultdict(list)\n",
+    "    \n",
+    "    def addEdge(self, u, v):\n",
+    "        self.graph[u].append(v)\n",
+    "    \n",
+    "    def BFS(self, s):\n",
+    "        visited = set()\n",
+    "        queue = [s]\n",
+    "        visited.add(s)\n",
+    "        \n",
+    "        while queue:\n",
+    "            s = queue.pop(0)\n",
+    "            print(s, end=\" \")\n",
+    "            \n",
+    "            for i in self.graph[s]:\n",
+    "                if i not in visited:\n",
+    "                    queue.append(i)\n",
+    "                    visited.add(i)\n",
+    "\n",
+    "# Driver code\n",
+    "g = Graph()\n",
+    "g.addEdge(0, 1)\n",
+    "g.addEdge(0, 2)\n",
+    "g.addEdge(1, 2)\n",
+    "g.addEdge(2, 0)\n",
+    "g.addEdge(2, 3)\n",
+    "g.addEdge(3, 3)\n",
+    "\n",
+    "print(\"Following is Breadth First Traversal (starting from vertex 2)\")\n",
+    "g.BFS(2)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "bf254719-1905-4293-81fe-c23b73e15385",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python [conda env:base] *",
+   "language": "python",
+   "name": "conda-base-py"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.12.7"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
